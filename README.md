@@ -1,4 +1,4 @@
-# Event Platform
+# Events.ma
 
 Event discovery and ticketing platform (Eventbrite-like).
 
@@ -6,10 +6,16 @@ Event discovery and ticketing platform (Eventbrite-like).
 
 - **Frontend:** React 18 + Vite + Tailwind CSS
 - **Backend:** Django 5 + Django REST Framework
-- **Database:** Supabase (PostgreSQL)
-- **Auth:** JWT (planned for STEP 2)
+- **Database:** Supabase (PostgreSQL) or SQLite for local development
+- **Auth:** JWT
 
 ## Quick Start
+
+### Prerequisites
+
+- Python 3.12+
+- Node.js 20+
+- npm or yarn
 
 ### Backend
 
@@ -37,11 +43,14 @@ Event discovery and ticketing platform (Eventbrite-like).
    cp .env.example .env
    ```
 
-5. Configure Supabase credentials in `.env` (see below).
-
-6. Run database migrations:
+5. Run database migrations:
    ```bash
    python manage.py migrate
+   ```
+
+6. Seed demo data (optional):
+   ```bash
+   python manage.py seed_demo
    ```
 
 7. Start the development server:
@@ -75,45 +84,96 @@ Event discovery and ticketing platform (Eventbrite-like).
 
    The app will be available at `http://localhost:5173`.
 
+### Running Tests
+
+**Backend:**
+```bash
+cd Backend
+pytest -v
+```
+
+**Frontend:**
+```bash
+cd Frontend
+npm run lint
+npm run build
+```
+
+## Demo Accounts
+
+After running `python manage.py seed_demo`, you can log in with:
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | admin@example.com | Admin123! |
+| Agent | agent@example.com | Agent123! |
+| Client | client@example.com | Client123! |
+| Organizer | organizer@example.com | Organizer123! |
+
+## Environment Variables
+
+### Backend (.env)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DJANGO_SECRET_KEY` | Django secret key | Required |
+| `DJANGO_DEBUG` | Debug mode | `False` |
+| `DJANGO_ALLOWED_HOSTS` | Allowed hosts | `localhost,127.0.0.1` |
+| `USE_SUPABASE` | Use Supabase PostgreSQL | `False` |
+| `SUPABASE_DB_*` | Supabase database credentials | Required if `USE_SUPABASE=True` |
+| `CORS_ALLOWED_ORIGINS` | Allowed CORS origins | `http://localhost:5173` |
+| `FRONTEND_URL` | Frontend URL | `http://localhost:5173` |
+| `QR_SECRET_KEY` | QR code signing secret | Required |
+| `STRIPE_SECRET_KEY` | Stripe secret key | Optional |
+| `STRIPE_PUBLIC_KEY` | Stripe public key | Optional |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook secret | Optional |
+
+### Frontend (.env)
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `VITE_API_URL` | Backend API URL | `http://localhost:8000` |
+
 ## Supabase Configuration
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. Go to **Project Settings > Database**
 3. Find your connection details under **Connection string > URI**
-4. Extract the following values and set them in `Backend/.env`:
-
-   | Variable | Description |
-   |---|---|
-   | `SUPABASE_DB_NAME` | Database name (usually `postgres`) |
-   | `SUPABASE_DB_USER` | Database user (usually `postgres`) |
-   | `SUPABASE_DB_PASSWORD` | Your database password |
-   | `SUPABASE_DB_HOST` | Host from the connection string (e.g. `db.xxxx.supabase.co`) |
-   | `SUPABASE_DB_PORT` | Port (usually `5432`) |
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/health/` | Health check |
+4. Set `USE_SUPABASE=True` in `Backend/.env`
+5. Configure the `SUPABASE_DB_*` variables
 
 ## Project Structure
 
 ```
 Backend/
-├── config/          # Django project settings
-│   ├── settings.py  # Configuration (DRF, CORS, Supabase)
-│   └── urls.py      # Root URL routing
-├── core/            # Core application
-│   ├── urls.py      # API routes
-│   └── views.py     # API views
-├── .env.example     # Environment template
-└── requirements.txt # Python dependencies
+├── accounts/         # User management
+├── config/           # Django project settings
+├── core/             # Core application
+├── events/           # Event management
+├── tickets/          # Ticket management
+├── manage.py
+├── requirements.txt
+└── pytest.ini
 
 Frontend/
 ├── src/
-│   ├── App.jsx      # Main component (Home page)
-│   ├── main.jsx     # Entry point
-│   └── index.css    # Tailwind CSS imports
-├── .env.example     # Environment template
-└── vite.config.js   # Vite configuration
+│   ├── api/          # API client
+│   ├── components/   # Reusable components
+│   ├── context/      # React context
+│   ├── pages/        # Page components
+│   └── utils/        # Utility functions
+├── package.json
+└── vite.config.js
 ```
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration:
+
+- **Backend tests:** Run with pytest against SQLite
+- **Frontend build:** Verify the production build works
+- **Linting:** Check code quality
+
+## License
+
+Private project.

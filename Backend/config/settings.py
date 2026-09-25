@@ -173,6 +173,8 @@ STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 STRIPE_PUBLIC_KEY = os.environ.get("STRIPE_PUBLIC_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
 
+QR_SECRET_KEY = os.environ.get("QR_SECRET_KEY", "")
+
 
 # =========================
 # MEDIA FILES
